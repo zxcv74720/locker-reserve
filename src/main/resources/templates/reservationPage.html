@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>성서대 컴소 사물함 예약</title>
+    <style>
+        .disabled-text {
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+<h1>사물함 예약</h1>
+
+<!-- 학생 정보 출력 -->
+<h2>
+    학번: <span th:text="${session.student.studentId}"></span>&emsp;
+    이름: <span th:text="${session.student.studentName}"></span>&emsp;
+    예약 사물함: <span th:text="${session.student.lockerNum != null ? session.student.lockerNum : '예약 가능'}"></span>
+</h2>
+
+<!-- 예약 취소 메시지 출력 -->
+<div th:if="${cancelMessage}">
+    <p th:text="${cancelMessage}"></p>
+</div>
+
+<!-- 예약 취소 버튼 -->
+<button type="button" th:if="${session.student.lockerNum != null}" th:data-locker-num="${session.student.lockerNum}" onclick="cancelReservation(this)">예약 취소</button>
+
+<!-- 사물함 목록 출력 -->
+<h3>사물함 목록</h3>
+<form action="/reservation" method="post">
+    <ul>
+        <li th:each="locker : ${lockers}">
+            <label>
+                <input type="checkbox" name="lockerNumber" th:value="${locker.lockerNum}" th:disabled="${locker.status == 1}">
+                <span th:text="${locker.lockerNum}" th:class="${locker.status == 1 ? 'disabled-text' : ''}"></span>
+            </label>
+        </li>
+    </ul>
+    <button type="submit" th:if="${session.student.lockerNum == null}">확인</button>
+</form>
+
+<script>
+    function cancelReservation(button) {
+        var lockerNum = button.getAttribute("data-locker-num");
+        if (confirm("예약을 취소하시겠습니까?")) {
+            // AJAX 요청을 통해 예약 취소를 처리하는 URL로 요청을 보냄
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/cancel", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // 예약 취소가 성공적으로 처리되었을 때, 페이지를 새로고침하여 업데이트된 정보를 표시
+                    location.reload();
+                } else {
+                    var cancelMessage = document.createElement("p");
+                    cancelMessage.textContent = "취소를 실패하였습니다.";
+                    document.body.appendChild(cancelMessage);
+                }
+            };
+            var data = JSON.stringify({ lockerNum: lockerNum });
+            xhr.send(data);
+        }
+    }
+</script>
+
+</body>
+</html>

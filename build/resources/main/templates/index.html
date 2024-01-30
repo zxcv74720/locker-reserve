@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>성서대 컴소 사물함 예약</title>
+</head>
+<body>
+<h1>로그인</h1>
+<form action="/login" method="post">
+    <label for="studentIdInput">학번을 입력하세요:</label>
+    <input type="text" id="studentIdInput" name="studentId">
+    <input type="submit" value="확인">
+</form>
+
+<script th:inline="javascript">
+    /* "errorMessage" 속성이 존재할 경우 알림을 띄움 */
+    var errorMessage = /*[[${errorMessage}]]*/ null;
+    if (errorMessage) {
+        alert(errorMessage);
+    }
+</script>
+</body>
+</html>
+
